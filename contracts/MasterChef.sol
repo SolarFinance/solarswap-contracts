@@ -84,6 +84,8 @@ contract MasterChef is Ownable {
         startBlock = _startBlock;
     }
 
+    receive() external payable {}
+
     function poolLength() external view returns (uint256) {
         return poolInfo.length;
     }
