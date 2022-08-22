@@ -44,7 +44,28 @@ async function main() {
   await masterChef.deployed();
   console.log('MasterChef contract deployed to:', masterChef.address);
 
-  // ---------------- Set owner of Treasury, WASA is MasterChef ------------------
+  // ---------------- 1. Set owner of Treasury, WASA is MasterChef ------------------
+  // TODO:
+
+  // ---------------- 2. Deposit cho Treasury 100k ASA + transfer 10tr USDT cho address tao liquidity ------------------
+  // TODO:
+
+  // ---------------- 3. Dung MasterChef tao pool 0 voi LP la WASA. allocpoint = 0 ------------------
+  // TODO:
+
+  // ---------------- 4. Init thanh khoan cho ASA-USDT ------------------
+  // TODO:
+
+  // ---------------- 5. Lay ten cua address ASA-USDT (xem thong tin token cua dia chi cap liquidity tren Explorer) ------------------
+  // TODO:
+
+  // ---------------- 6. Dung MasterChef tao pool 1 voi LP la ASA-USDT allopoint = 1000 ------------------
+  // TODO:
+
+  // ---------------- 7. Write cac address cua deploy_1 vao file ------------------
+  // TODO:
+
+  // ---------------- 8. Verify contract da deploy (lay contract address trong file o buoc 7) ------------------
   // TODO:
 }
 
