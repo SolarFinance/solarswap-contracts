@@ -1,0 +1,58 @@
+{
+	"Treasury": {
+		"testnet": { "address": "0x189be55E871c92899ca475C48F8703dacBb5544D", "arguments": [] }
+	},
+	"WASA": {
+		"testnet": { "address": "0x98761D5957AAf9fafbdf1A0B031a0E7a96aDD041", "arguments": [] }
+	},
+	"USDT": {
+		"testnet": {
+			"address": "0xa71D3EC7Eea574B8e9bfd1eD7f53DfcF806390a9",
+			"arguments": ["Tether USD", "USDT", "30000000000000000000000000"]
+		}
+	},
+	"multicall2": {
+		"testnet": { "address": "0x4eD75D8C2e9A8756E060646555f12F478eb78997", "arguments": [] }
+	},
+	"SolarswapFactory": {
+		"testnet": {
+			"address": "0x4A8B2ec0A918656b5D668bef80d25d510E6E6a16",
+			"arguments": ["0xc72a12090127B7E02A7544036b3D5872d9BAAD6C"]
+		}
+	},
+	"INIT_CODE_PAIR_HASH": {
+		"testnet": {
+			"address": "0xb50ecbbc0748c14b5445b459c75dc9fea42b4b5543f81251ba0ea03dede5a90e",
+			"arguments": []
+		}
+	},
+	"SolarswapRouter01": {
+		"testnet": {
+			"address": "0x43E8CD11A26e9cBC6c4B64cCBA0a47B8E677FAD6",
+			"arguments": [
+				"0x4A8B2ec0A918656b5D668bef80d25d510E6E6a16",
+				"0x98761D5957AAf9fafbdf1A0B031a0E7a96aDD041"
+			]
+		}
+	},
+	"SolarswapRouter": {
+		"testnet": {
+			"address": "0xfA3F5e8AA3fE8d07EE5ca88202aAf6d5c654b88A",
+			"arguments": [
+				"0x4A8B2ec0A918656b5D668bef80d25d510E6E6a16",
+				"0x98761D5957AAf9fafbdf1A0B031a0E7a96aDD041"
+			]
+		}
+	},
+	"MasterChef": {
+		"testnet": {
+			"address": "0x931A46Ac7D4091B7271338972472fc73d5436a52",
+			"arguments": [
+				"0x189be55E871c92899ca475C48F8703dacBb5544D",
+				"0x98761D5957AAf9fafbdf1A0B031a0E7a96aDD041",
+				"2000000000000000000",
+				"800000"
+			]
+		}
+	}
+}
