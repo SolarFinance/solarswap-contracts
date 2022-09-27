@@ -6,16 +6,15 @@ import "openzeppelin6/access/Ownable.sol";
 contract Treasury is Ownable {
     receive() external payable {}
 
-    function getBalance() public view returns (uint256) {
-        return address(this).balance;
-    }
-
     function claim(address payable _to, uint256 _amount)
         public
-        payable
         onlyOwner
     {
-        require(getBalance() >= _amount, "Insufficient Astra to claim");
-        _to.transfer(_amount);
+        uint256 asaBal = address(this).balance;
+        if (_amount > asaBal) {
+            _to.transfer(asaBal);
+        } else {
+            _to.transfer(_amount);
+        }
     }
 }

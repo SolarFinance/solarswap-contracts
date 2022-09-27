@@ -35,9 +35,9 @@ contract ARC20 is Context, IARC20, Ownable {
     using SafeMath for uint256;
     using Address for address;
 
-    mapping(address => uint256) public _balances;
+    mapping(address => uint256) private _balances;
 
-    mapping(address => mapping(address => uint256)) public _allowances;
+    mapping(address => mapping(address => uint256)) private _allowances;
 
     uint256 private _totalSupply;
 

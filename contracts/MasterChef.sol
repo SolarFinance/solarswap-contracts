@@ -52,8 +52,6 @@ contract MasterChef is Ownable {
     WASA public wasa;
     // WASA tokens created per block.
     uint256 public wasaPerBlock;
-    // Bonus muliplier for early wasa makers.
-    uint256 public BONUS_MULTIPLIER = 1;
 
     // Info of each pool.
     PoolInfo[] public poolInfo;
@@ -64,6 +62,9 @@ contract MasterChef is Ownable {
     // The block number when WASA mining starts.
     uint256 public startBlock;
 
+    event Add(uint256 allocPoint, address indexed lpToken);
+    event Set(uint256 indexed pid, uint256 allocPoint);
+    event UpdateWasaPerBlock(uint256 newWasaPerBlock);
     event Deposit(address indexed user, uint256 indexed pid, uint256 amount);
     event Withdraw(address indexed user, uint256 indexed pid, uint256 amount);
     event EmergencyWithdraw(
@@ -112,6 +113,7 @@ contract MasterChef is Ownable {
                 accWASAPerShare: 0
             })
         );
+        emit Add(_allocPoint, _lpToken);
     }
 
     // Update the given pool's WASA allocation point. Can only be called by the owner.
@@ -127,6 +129,7 @@ contract MasterChef is Ownable {
             _allocPoint
         );
         poolInfo[_pid].allocPoint = _allocPoint;
+        emit Set(_pid, _allocPoint);
     }
 
     // Return reward multiplier over the given _from to _to block.
@@ -135,7 +138,7 @@ contract MasterChef is Ownable {
         view
         returns (uint256)
     {
-        return _to.sub(_from).mul(BONUS_MULTIPLIER);
+        return _to.sub(_from);
     }
 
     // View function to see pending WASAs on frontend.
@@ -173,7 +176,7 @@ contract MasterChef is Ownable {
     }
 
     // Update reward variables of the given pool to be up-to-date.
-    function updatePool(uint256 _pid) public payable {
+    function updatePool(uint256 _pid) public {
         PoolInfo storage pool = poolInfo[_pid];
         if (block.number <= pool.lastRewardBlock) {
             return;
@@ -268,5 +271,6 @@ contract MasterChef is Ownable {
 
     function updateWasaPerBlock(uint256 newWasaPerBlock) external onlyOwner {
         wasaPerBlock = newWasaPerBlock;
+        emit UpdateWasaPerBlock(newWasaPerBlock);
     }
 }
