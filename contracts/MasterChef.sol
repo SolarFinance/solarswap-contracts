@@ -132,15 +132,6 @@ contract MasterChef is Ownable {
         emit Set(_pid, _allocPoint);
     }
 
-    // Return reward multiplier over the given _from to _to block.
-    function getMultiplier(uint256 _from, uint256 _to)
-        public
-        view
-        returns (uint256)
-    {
-        return _to.sub(_from);
-    }
-
     // View function to see pending WASAs on frontend.
     function pendingWASA(uint256 _pid, address _user)
         external
@@ -152,10 +143,7 @@ contract MasterChef is Ownable {
         uint256 accWASAPerShare = pool.accWASAPerShare;
         uint256 lpSupply = pool.lpToken.balanceOf(address(this));
         if (block.number > pool.lastRewardBlock && lpSupply != 0) {
-            uint256 multiplier = getMultiplier(
-                pool.lastRewardBlock,
-                block.number
-            );
+            uint256 multiplier = block.number.sub(pool.lastRewardBlock);
             uint256 wasaReward = multiplier
                 .mul(wasaPerBlock)
                 .mul(pool.allocPoint)
@@ -186,7 +174,7 @@ contract MasterChef is Ownable {
             pool.lastRewardBlock = block.number;
             return;
         }
-        uint256 multiplier = getMultiplier(pool.lastRewardBlock, block.number);
+        uint256 multiplier = block.number.sub(pool.lastRewardBlock);
         uint256 wasaReward = multiplier
             .mul(wasaPerBlock)
             .mul(pool.allocPoint)
