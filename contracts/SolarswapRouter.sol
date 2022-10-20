@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0
-pragma solidity =0.6.6;
+pragma solidity =0.6.12;
 
 import "@uniswap/lib/contracts/libraries/TransferHelper.sol";
 import "openzeppelin6/token/ERC20/IERC20.sol";
@@ -10,7 +10,7 @@ import "./libraries/SolarswapLibrary.sol";
 import "./interfaces/IWETH.sol";
 
 contract SolarswapRouter is ISolarswapRouter02 {
-    using SafeMath for uint256;
+    using SafeMathDappHub for uint256;
 
     address public immutable override factory;
     address public immutable override WETH;

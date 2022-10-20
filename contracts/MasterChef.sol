@@ -5,8 +5,8 @@ import "openzeppelin6/access/Ownable.sol";
 import "openzeppelin6/GSN/Context.sol";
 import "openzeppelin6/math/SafeMath.sol";
 import "openzeppelin6/utils/Address.sol";
-import "./libraries/SafeARC20.sol";
-import "./libraries/ARC20.sol";
+import "openzeppelin6/token/ERC20/SafeERC20.sol";
+import "openzeppelin6/token/ERC20/ERC20.sol";
 import "./libraries/WASA.sol";
 import "./Treasury.sol";
 
@@ -19,7 +19,7 @@ import "./Treasury.sol";
 // Have fun reading it. Hopefully it's bug-free. God bless.
 contract MasterChef is Ownable {
     using SafeMath for uint256;
-    using SafeARC20 for IARC20;
+    using SafeERC20 for IERC20;
 
     // Info of each user.
     struct UserInfo {
@@ -40,7 +40,7 @@ contract MasterChef is Ownable {
 
     // Info of each pool.
     struct PoolInfo {
-        IARC20 lpToken; // Address of LP token contract.
+        IERC20 lpToken; // Address of LP token contract.
         uint256 allocPoint; // How many allocation points assigned to this pool. WASAs to distribute per block.
         uint256 lastRewardBlock; // Last block number that WASAs distribution occurs.
         uint256 accWASAPerShare; // Accumulated WASAs per share, times 1e12. See below.
@@ -62,7 +62,7 @@ contract MasterChef is Ownable {
     // The block number when WASA mining starts.
     uint256 public startBlock;
 
-    event Add(uint256 allocPoint, address indexed lpToken);
+    event Add(uint256 allocPoint, IERC20 indexed lpToken);
     event Set(uint256 indexed pid, uint256 allocPoint);
     event UpdateWasaPerBlock(uint256 newWasaPerBlock);
     event Deposit(address indexed user, uint256 indexed pid, uint256 amount);
@@ -95,7 +95,7 @@ contract MasterChef is Ownable {
     // XXX DO NOT add the same LP token more than once. Rewards will be messed up if you do.
     function add(
         uint256 _allocPoint,
-        IARC20 _lpToken,
+        IERC20 _lpToken,
         bool _withUpdate
     ) public onlyOwner {
         if (_withUpdate) {

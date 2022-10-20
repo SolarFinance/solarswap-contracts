@@ -2,7 +2,7 @@
 pragma solidity =0.5.16;
 
 import "./interfaces/ISolarswapERC20.sol";
-import "./libraries/SafeMath.sol";
+import "openzeppelin5/math/SafeMath.sol";
 
 contract SolarswapERC20 is ISolarswapERC20 {
     using SafeMath for uint256;

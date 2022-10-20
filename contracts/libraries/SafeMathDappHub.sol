@@ -3,7 +3,7 @@ pragma solidity >=0.5.0 <0.7.0;
 
 // a library for performing overflow-safe math, courtesy of DappHub (https://github.com/dapphub/ds-math)
 
-library SafeMath {
+library SafeMathDappHub {
     function add(uint256 x, uint256 y) internal pure returns (uint256 z) {
         require((z = x + y) >= x, "ds-math-add-overflow");
     }

@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity >=0.5.0;
 
-import "./SafeMath.sol";
+import "./SafeMathDappHub.sol";
 import "../interfaces/ISolarswapFactory.sol";
 import "../interfaces/ISolarswapPair.sol";
 
 library SolarswapLibrary {
-    using SafeMath for uint256;
+    using SafeMathDappHub for uint256;
 
     // returns sorted token addresses, used to handle return values from pairs sorted in this order
     function sortTokens(address tokenA, address tokenB)
@@ -83,10 +83,11 @@ library SolarswapLibrary {
             reserveIn > 0 && reserveOut > 0,
             "SolarswapLibrary: INSUFFICIENT_LIQUIDITY"
         );
-        uint256 amountInWithFee = amountIn.mul(9975);
+        uint256 amountInWithFee = amountIn.mul(998);
         uint256 numerator = amountInWithFee.mul(reserveOut);
-        uint256 denominator = reserveIn.mul(10000).add(amountInWithFee);
+        uint256 denominator = reserveIn.mul(1000).add(amountInWithFee);
         amountOut = numerator / denominator;
+        require(reserveOut > amountOut, "SolarswapLibrary: INSUFFICIENT_LIQUIDITY");
     }
 
     // given an output amount of an asset and pair reserves, returns a required input amount of the other asset
@@ -100,8 +101,8 @@ library SolarswapLibrary {
             reserveIn > 0 && reserveOut > 0,
             "SolarswapLibrary: INSUFFICIENT_LIQUIDITY"
         );
-        uint256 numerator = reserveIn.mul(amountOut).mul(10000);
-        uint256 denominator = reserveOut.sub(amountOut).mul(9975);
+        uint256 numerator = reserveIn.mul(amountOut).mul(1000);
+        uint256 denominator = reserveOut.sub(amountOut).mul(998);
         amountIn = (numerator / denominator).add(1);
     }
 
