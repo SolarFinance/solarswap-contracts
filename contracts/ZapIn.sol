@@ -132,7 +132,15 @@ contract ZapIn {
         bytes32 s
     ) external ensure(deadline) returns (uint256 amountOut) {
         uint256 value = approveMax ? uint256(-1) : liquidity;
-        IERC20Permit(pool).permit(msg.sender, address(this), value, deadline, v, r, s);
+        IERC20Permit(pool).permit(
+            msg.sender,
+            address(this),
+            value,
+            deadline,
+            v,
+            r,
+            s
+        );
         amountOut = _zapOut(tokenIn, tokenOut, liquidity, pool, minTokenOut);
         tokenOut.safeTransfer(to, amountOut);
     }
@@ -145,7 +153,13 @@ contract ZapIn {
         uint256 minTokenOut,
         uint256 deadline
     ) external ensure(deadline) returns (uint256 amountOut) {
-        amountOut = _zapOut(tokenIn, IERC20(weth), liquidity, pool, minTokenOut);
+        amountOut = _zapOut(
+            tokenIn,
+            IERC20(weth),
+            liquidity,
+            pool,
+            minTokenOut
+        );
         IWETH(weth).withdraw(amountOut);
         TransferHelper.safeTransferETH(to, amountOut);
     }
@@ -163,8 +177,22 @@ contract ZapIn {
         bytes32 s
     ) external returns (uint256 amountOut) {
         uint256 value = approveMax ? uint256(-1) : liquidity;
-        IERC20Permit(pool).permit(msg.sender, address(this), value, deadline, v, r, s);
-        amountOut = _zapOut(tokenIn, IERC20(weth), liquidity, pool, minTokenOut);
+        IERC20Permit(pool).permit(
+            msg.sender,
+            address(this),
+            value,
+            deadline,
+            v,
+            r,
+            s
+        );
+        amountOut = _zapOut(
+            tokenIn,
+            IERC20(weth),
+            liquidity,
+            pool,
+            minTokenOut
+        );
         IWETH(weth).withdraw(amountOut);
         TransferHelper.safeTransferETH(to, amountOut);
     }
@@ -176,7 +204,12 @@ contract ZapIn {
         uint256 userIn
     ) external view returns (uint256 tokenInAmount, uint256 tokenOutAmount) {
         uint256 amountSwap;
-        (amountSwap, tokenOutAmount) = calculateSwapAmounts(tokenIn, tokenOut, pool, userIn);
+        (amountSwap, tokenOutAmount) = calculateSwapAmounts(
+            tokenIn,
+            tokenOut,
+            pool,
+            userIn
+        );
         tokenInAmount = userIn.sub(amountSwap);
     }
 
@@ -186,13 +219,18 @@ contract ZapIn {
         address pool,
         uint256 lpQty
     ) external view returns (uint256) {
-        require(ISolarswapFactory(factory).getPair(address(tokenIn), address(tokenOut)) == address(pool), "SolarswapZapIn: INVALID_POOL");
-        (uint256 amountIn, uint256 amountOut, ReserveData memory data) = _calculateBurnAmount(
-            pool,
-            tokenIn,
-            tokenOut,
-            lpQty
+        require(
+            ISolarswapFactory(factory).getPair(
+                address(tokenIn),
+                address(tokenOut)
+            ) == address(pool),
+            "SolarswapZapIn: INVALID_POOL"
         );
+        (
+            uint256 amountIn,
+            uint256 amountOut,
+            ReserveData memory data
+        ) = _calculateBurnAmount(pool, tokenIn, tokenOut, lpQty);
         amountOut += SolarswapLibrary.getAmountOut(
             amountIn,
             data.rIn,
@@ -207,8 +245,18 @@ contract ZapIn {
         address pool,
         uint256 userIn
     ) public view returns (uint256 amountSwap, uint256 amountOutput) {
-        require(ISolarswapFactory(factory).getPair(address(tokenIn), address(tokenOut)) == address(pool), "SolarswapZapIn: INVALID_POOL");
-        (uint256 rIn, uint256 rOut) = SolarswapLibrary.getReserves(address(factory), address(tokenIn), address(tokenOut));
+        require(
+            ISolarswapFactory(factory).getPair(
+                address(tokenIn),
+                address(tokenOut)
+            ) == address(pool),
+            "SolarswapZapIn: INVALID_POOL"
+        );
+        (uint256 rIn, uint256 rOut) = SolarswapLibrary.getReserves(
+            address(factory),
+            address(tokenIn),
+            address(tokenOut)
+        );
         amountSwap = _calculateSwapInAmount(rIn, rOut, userIn);
         amountOutput = SolarswapLibrary.getAmountOut(amountSwap, rIn, rOut);
     }
@@ -220,7 +268,10 @@ contract ZapIn {
         address pool,
         address to
     ) internal {
-        (address token0, ) = SolarswapLibrary.sortTokens(address(tokenIn), address(tokenOut));
+        (address token0, ) = SolarswapLibrary.sortTokens(
+            address(tokenIn),
+            address(tokenOut)
+        );
         (uint256 amount0Out, uint256 amount1Out) = tokenIn == IERC20(token0)
             ? (uint256(0), amountOut)
             : (amountOut, uint256(0));
@@ -236,24 +287,41 @@ contract ZapIn {
     ) internal returns (uint256 amountOut) {
         uint256 amountIn;
         {
-            require(ISolarswapFactory(factory).getPair(address(tokenIn), address(tokenOut)) == address(pool), "SolarswapZapIn: INVALID_POOL");
+            require(
+                ISolarswapFactory(factory).getPair(
+                    address(tokenIn),
+                    address(tokenOut)
+                ) == address(pool),
+                "SolarswapZapIn: INVALID_POOL"
+            );
             IERC20(pool).safeTransferFrom(msg.sender, pool, liquidity); // send liquidity to pool
-            (uint256 amount0, uint256 amount1) = ISolarswapPair(pool).burn(address(this));
-            (address token0, ) = SolarswapLibrary.sortTokens(address(tokenIn), address(tokenOut));
-            (amountIn, amountOut) = tokenIn == IERC20(token0) ? (amount0, amount1) : (amount1, amount0);
+            (uint256 amount0, uint256 amount1) = ISolarswapPair(pool).burn(
+                address(this)
+            );
+            (address token0, ) = SolarswapLibrary.sortTokens(
+                address(tokenIn),
+                address(tokenOut)
+            );
+            (amountIn, amountOut) = tokenIn == IERC20(token0)
+                ? (amount0, amount1)
+                : (amount1, amount0);
         }
         uint256 swapAmount;
         {
-            (
-                uint256 rIn,
-                uint256 rOut
-            ) = SolarswapLibrary.getReserves(address(factory), address(tokenIn), address(tokenOut));
+            (uint256 rIn, uint256 rOut) = SolarswapLibrary.getReserves(
+                address(factory),
+                address(tokenIn),
+                address(tokenOut)
+            );
             swapAmount = SolarswapLibrary.getAmountOut(amountIn, rIn, rOut);
         }
         tokenIn.safeTransfer(pool, amountIn);
         _swap(swapAmount, tokenIn, tokenOut, pool, address(this));
         amountOut += swapAmount;
-        require(amountOut >= minTokenOut, "SolarswapZapIn: INSUFFICIENT_OUTPUT_AMOUNT");
+        require(
+            amountOut >= minTokenOut,
+            "SolarswapZapIn: INSUFFICIENT_OUTPUT_AMOUNT"
+        );
     }
 
     function _calculateBurnAmount(
@@ -271,7 +339,11 @@ contract ZapIn {
         )
     {
         ReserveData memory data;
-        (data.rIn, data.rOut) = SolarswapLibrary.getReserves(address(factory), address(tokenIn), address(tokenOut));
+        (data.rIn, data.rOut) = SolarswapLibrary.getReserves(
+            address(factory),
+            address(tokenIn),
+            address(tokenOut)
+        );
         uint256 totalSupply = IERC20(address(pool)).totalSupply();
         // calculate amountOut
         amountIn = lpQty.mul(data.rIn) / totalSupply;
@@ -297,7 +369,9 @@ contract ZapIn {
         }
         uint256 inverseC = rIn.mul(userIn);
         // numerator = sqrt(b^2 -4ac) - b
-        uint256 numerator = MathExt.sqrt(b.mul(b).add(inverseC.mul(4 * r) / 1000)).sub(b);
+        uint256 numerator = MathExt
+            .sqrt(b.mul(b).add(inverseC.mul(4 * r) / 1000))
+            .sub(b);
         return numerator.mul(1000) / (2 * r);
     }
 }
