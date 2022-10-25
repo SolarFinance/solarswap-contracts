@@ -90,7 +90,7 @@ const config: HardhatUserConfig = {
 				network: "testnet",
 				chainId: 11115,
 				urls: {
-					apiURL: "https://explorer.astranaut.dev/api",
+					apiURL: "https://blockscout.astranaut.dev/api",
 					browserURL: "https://explorer.astranaut.dev",
 				},
 			},

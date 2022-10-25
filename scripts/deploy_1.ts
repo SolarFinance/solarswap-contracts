@@ -121,6 +121,19 @@ async function main() {
 	};
 	console.log("SolarswapRouter contract deployed to:", solarswapRouter.address);
 
+	//------------------------- ZapIn ---------------------------------------
+	const ZapIn = await ethers.getContractFactory("ZapIn");
+	const zapIn = await ZapIn.deploy(solarswapFactory.address, wasa.address);
+	await zapIn.deployed();
+	result["ZapIn"] = {
+		...(result["ZapIn"] || {}),
+		[networkName]: {
+			address: zapIn.address,
+			arguments: [solarswapFactory, wasa.address],
+		},
+	};
+	console.log("ZapIn contract deployed to:", solarswapRouter.address);
+
 	//------------------------- MasterChef ---------------------------------------
 	const MasterChef = await ethers.getContractFactory("MasterChef");
 	const masterChef = await MasterChef.deploy(
