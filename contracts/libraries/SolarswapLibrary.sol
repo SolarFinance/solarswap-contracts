@@ -26,7 +26,7 @@ library SolarswapLibrary {
         address factory,
         address tokenA,
         address tokenB
-    ) internal pure returns (address pair) {
+    ) internal view returns (address pair) {
         (address token0, address token1) = sortTokens(tokenA, tokenB);
         pair = address(
             uint256(
@@ -35,7 +35,7 @@ library SolarswapLibrary {
                         hex"ff",
                         factory,
                         keccak256(abi.encodePacked(token0, token1)),
-                        hex"b50ecbbc0748c14b5445b459c75dc9fea42b4b5543f81251ba0ea03dede5a90e" // init code hash
+                        ISolarswapFactory(factory).INIT_CODE_PAIR_HASH() // init code hash
                     )
                 )
             )
