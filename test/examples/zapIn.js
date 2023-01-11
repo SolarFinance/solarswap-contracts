@@ -10,7 +10,7 @@ const ZapIn = artifacts.require('ZapIn');
 const SLSRouter = artifacts.require('SolarswapRouter');
 const SLSpair = artifacts.require('SolarswapPair');
 const SLSFactory = artifacts.require('SolarswapFactory');
-const WETH = artifacts.require('WETH9');
+const WETH = artifacts.require('WASA');
 const TestToken = artifacts.require('TestToken');
 
 contract('ZapIn', accounts => {

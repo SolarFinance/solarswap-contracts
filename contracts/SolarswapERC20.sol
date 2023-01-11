@@ -7,8 +7,8 @@ import "openzeppelin5/math/SafeMath.sol";
 contract SolarswapERC20 is ISolarswapERC20 {
     using SafeMath for uint256;
 
-    string public constant name = "Solarswap LPs";
-    string public constant symbol = "WASA-LP";
+    string public name = "Solarswap LPs";
+    string public symbol = "WASA-LP";
     uint8 public constant decimals = 18;
     uint256 public totalSupply;
     mapping(address => uint256) public balanceOf;

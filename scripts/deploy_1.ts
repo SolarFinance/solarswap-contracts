@@ -11,9 +11,14 @@ function writeResult(result: any) {
 	fs.writeFileSync(OUTPUT, JSON.stringify(result));
 }
 
+function readResult() {
+	return JSON.parse(fs.readFileSync(OUTPUT, "utf8"));
+}
+
 async function main() {
 	let result: DeployedResult | any = {};
 	const networkName = network.name;
+	const startBlock = "5000"; // must less than current latest block
 
 	const [deployer] = await ethers.getSigners();
 	//------------------------- Treasury ---------------------------------------
@@ -129,18 +134,18 @@ async function main() {
 		...(result["ZapIn"] || {}),
 		[networkName]: {
 			address: zapIn.address,
-			arguments: [solarswapFactory, wasa.address],
+			arguments: [solarswapFactory.address, wasa.address],
 		},
 	};
-	console.log("ZapIn contract deployed to:", solarswapRouter.address);
+	console.log("ZapIn contract deployed to:", zapIn.address);
 
 	//------------------------- MasterChef ---------------------------------------
 	const MasterChef = await ethers.getContractFactory("MasterChef");
 	const masterChef = await MasterChef.deploy(
 		treasury.address,
 		wasa.address,
-		parseEther("2"),
-		"800000"
+		parseEther("0.5"),
+		startBlock
 	);
 
 	await masterChef.deployed();
@@ -148,7 +153,7 @@ async function main() {
 		...(result["MasterChef"] || {}),
 		[networkName]: {
 			address: masterChef.address,
-			arguments: [treasury.address, wasa.address, parseEther("2").toString(), "800000"],
+			arguments: [treasury.address, wasa.address, parseEther("0.5").toString(), startBlock],
 		},
 	};
 	console.log("MasterChef contract deployed to:", masterChef.address);
@@ -158,8 +163,10 @@ async function main() {
 
 	// Continue deploy another smartcontract
 	await deploy2(treasury, wasa, usdt, solarswapFactory, solarswapRouter, masterChef);
-	// // Verify smartcontract
-	await deploy3(result);
+
+	// Verify smartcontract
+	let dataToVerify = readResult();
+	await deploy3(dataToVerify);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

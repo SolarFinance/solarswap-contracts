@@ -9,6 +9,7 @@ import "./libraries/Math.sol";
 import "./libraries/UQ112x112.sol";
 import "./interfaces/ISolarswapFactory.sol";
 import "./interfaces/ISolarswapCallee.sol";
+import "./interfaces/IERC20Metadata.sol";
 
 contract SolarswapPair is ISolarswapPair, SolarswapERC20 {
     using SafeMath for uint256;
@@ -36,6 +37,11 @@ contract SolarswapPair is ISolarswapPair, SolarswapERC20 {
         unlocked = 0;
         _;
         unlocked = 1;
+    }
+
+    modifier checkFactory() {
+        require(msg.sender == factory, "Solarswap: FORBIDDEN"); // sufficient check
+        _;
     }
 
     function getReserves()
@@ -88,10 +94,23 @@ contract SolarswapPair is ISolarswapPair, SolarswapERC20 {
     }
 
     // called once by the factory at time of deployment
-    function initialize(address _token0, address _token1) external {
-        require(msg.sender == factory, "Solarswap: FORBIDDEN"); // sufficient check
+    function initialize(address _token0, address _token1) external checkFactory {
         token0 = _token0;
         token1 = _token1;
+        IERC20Metadata _token0meta = IERC20Metadata(address(_token0));
+        IERC20Metadata _token1meta = IERC20Metadata(address(_token1));
+        setLpName(string(abi.encodePacked("SolarSwap LP ", _token0meta.symbol(), "-", _token1meta.symbol())));
+        setLpSymbol(string(abi.encodePacked(_token0meta.symbol(), "-", _token1meta.symbol())));
+    }
+
+    // set the name of the LP Token
+    function setLpName(string memory _name) internal {
+        name = _name;
+    }
+
+    // set the symbol of the LP Token
+    function setLpSymbol(string memory _symbol) internal {
+        symbol = _symbol;
     }
 
     // update reserves and, on the first call per block, price accumulators

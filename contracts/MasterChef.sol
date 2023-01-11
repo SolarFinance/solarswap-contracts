@@ -76,7 +76,7 @@ contract MasterChef is Ownable {
     constructor(
         Treasury _treasury,
         WASA _wasa,
-        uint256 _wasaPerBlock, // 2
+        uint256 _wasaPerBlock, // 0.5
         uint256 _startBlock
     ) public {
         treasury = _treasury;
