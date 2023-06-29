@@ -231,7 +231,9 @@ contract ZapIn {
             uint256 amountOut,
             ReserveData memory data
         ) = _calculateBurnAmount(pool, tokenIn, tokenOut, lpQty);
+        uint256 allFee = getAllFee();
         amountOut += SolarswapLibrary.getAmountOut(
+            allFee,
             amountIn,
             data.rIn,
             data.rOut
@@ -258,7 +260,8 @@ contract ZapIn {
             address(tokenOut)
         );
         amountSwap = _calculateSwapInAmount(rIn, rOut, userIn);
-        amountOutput = SolarswapLibrary.getAmountOut(amountSwap, rIn, rOut);
+        uint256 allFee = getAllFee();
+        amountOutput = SolarswapLibrary.getAmountOut(allFee, amountSwap, rIn, rOut);
     }
 
     function _swap(
@@ -313,7 +316,8 @@ contract ZapIn {
                 address(tokenIn),
                 address(tokenOut)
             );
-            swapAmount = SolarswapLibrary.getAmountOut(amountIn, rIn, rOut);
+            uint256 allFee = getAllFee();
+            swapAmount = SolarswapLibrary.getAmountOut(allFee, amountIn, rIn, rOut);
         }
         tokenIn.safeTransfer(pool, amountIn);
         _swap(swapAmount, tokenIn, tokenOut, pool, address(this));
@@ -357,21 +361,26 @@ contract ZapIn {
         uint256 rIn,
         uint256 rOut,
         uint256 userIn
-    ) internal pure returns (uint256) {
-        uint256 r = 998;
+    ) internal view returns (uint256) {
+        uint256 allFee = getAllFee();
+        uint256 r = 10000 - allFee;
         // vIn = rIn, vOut = rOut, r = 0.998
         // b = (vOut * rIn + userIn * (vOut - rOut)) * r / PRECISION / rOut+ vIN
         uint256 b;
         {
             uint256 tmp = rOut.mul(rIn);
-            b = tmp.div(rOut).mul(r) / 1000;
+            b = tmp.div(rOut).mul(r) / 10000;
             b = b.add(rIn);
         }
         uint256 inverseC = rIn.mul(userIn);
         // numerator = sqrt(b^2 -4ac) - b
         uint256 numerator = MathExt
-            .sqrt(b.mul(b).add(inverseC.mul(4 * r) / 1000))
+            .sqrt(b.mul(b).add(inverseC.mul(4 * r) / 10000))
             .sub(b);
-        return numerator.mul(1000) / (2 * r);
+        return numerator.mul(10000) / (2 * r);
+    }
+
+    function getAllFee() internal view returns (uint256) {
+        return ISolarswapFactory(factory).allFee();
     }
 }

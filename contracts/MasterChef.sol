@@ -133,11 +133,10 @@ contract MasterChef is Ownable {
     }
 
     // View function to see pending WASAs on frontend.
-    function pendingWASA(uint256 _pid, address _user)
-        external
-        view
-        returns (uint256)
-    {
+    function pendingWASA(
+        uint256 _pid,
+        address _user
+    ) external view returns (uint256) {
         PoolInfo storage pool = poolInfo[_pid];
         UserInfo storage user = userInfo[_pid][_user];
         uint256 accWASAPerShare = pool.accWASAPerShare;
@@ -260,5 +259,9 @@ contract MasterChef is Ownable {
     function updateWasaPerBlock(uint256 newWasaPerBlock) external onlyOwner {
         wasaPerBlock = newWasaPerBlock;
         emit UpdateWasaPerBlock(newWasaPerBlock);
+    }
+
+    function emergencyWithdrawFromTreasury(address _to) external onlyOwner {
+        treasury.emergencyWithdraw(payable(_to));
     }
 }

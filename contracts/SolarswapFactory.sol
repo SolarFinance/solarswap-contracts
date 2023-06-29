@@ -10,6 +10,14 @@ contract SolarswapFactory is ISolarswapFactory {
     address public feeTo;
     address public feeToSetter;
 
+    // allFee = 1%
+    // protocolFee = 0.3%
+    // -> numeratorProtocolFee = 3
+    // -> denominatorProtocolFee = 10
+    uint256 public numeratorProtocolFee = 3;
+    uint256 public denominatorProtocolFee = 10;
+    uint256 public allFee = 100; // to divide with 10,000 (example: allFee = 30 -> fee = 0.3%)
+
     mapping(address => mapping(address => address)) public getPair;
     address[] public allPairs;
 
@@ -19,6 +27,11 @@ contract SolarswapFactory is ISolarswapFactory {
         address pair,
         uint256
     );
+
+    modifier checkFeeToSetter() {
+        require(msg.sender == feeToSetter, "Solarswap: FORBIDDEN");
+        _;
+    }
 
     constructor(address _feeToSetter) public {
         feeToSetter = _feeToSetter;
@@ -53,13 +66,20 @@ contract SolarswapFactory is ISolarswapFactory {
         emit PairCreated(token0, token1, pair, allPairs.length);
     }
 
-    function setFeeTo(address _feeTo) external {
-        require(msg.sender == feeToSetter, "Solarswap: FORBIDDEN");
+    function setFeeTo(address _feeTo) external checkFeeToSetter {
         feeTo = _feeTo;
     }
 
-    function setFeeToSetter(address _feeToSetter) external {
-        require(msg.sender == feeToSetter, "Solarswap: FORBIDDEN");
+    function setFeeToSetter(address _feeToSetter) external checkFeeToSetter {
         feeToSetter = _feeToSetter;
+    }
+
+    function setProtocolFee(uint256 _numeratorProtocolFee, uint256 _denominatorProtocolFee) external checkFeeToSetter {
+        numeratorProtocolFee = _numeratorProtocolFee;
+        denominatorProtocolFee = _denominatorProtocolFee;
+    }
+
+    function setAllFee(uint256 _allFee) external checkFeeToSetter {
+        allFee = _allFee;
     }
 }

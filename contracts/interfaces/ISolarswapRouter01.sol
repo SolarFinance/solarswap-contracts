@@ -141,13 +141,13 @@ interface ISolarswapRouter01 {
         uint256 amountIn,
         uint256 reserveIn,
         uint256 reserveOut
-    ) external pure returns (uint256 amountOut);
+    ) external view returns (uint256 amountOut);
 
     function getAmountIn(
         uint256 amountOut,
         uint256 reserveIn,
         uint256 reserveOut
-    ) external pure returns (uint256 amountIn);
+    ) external view returns (uint256 amountIn);
 
     function getAmountsOut(uint256 amountIn, address[] calldata path)
         external
