@@ -151,10 +151,6 @@ contract SolarswapPair is ISolarswapPair, SolarswapERC20 {
             .numeratorProtocolFee();
         uint256 denominatorProtocolFee = ISolarswapFactory(factory)
             .denominatorProtocolFee();
-        require(
-            numeratorProtocolFee > 0 && denominatorProtocolFee > 0,
-            "Solarswap: numeratorProtocolFee AND denominatorProtocolFee NOT SET"
-        );
         feeOn = feeTo != address(0);
         uint256 _kLast = kLast; // gas savings
         if (feeOn) {

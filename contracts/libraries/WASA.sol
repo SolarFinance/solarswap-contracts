@@ -20,6 +20,7 @@ contract WASA {
     string public name = "Wrapped Astra";
     string public symbol = "WASA";
     uint8 public decimals = 18;
+    uint256 public totalSupply;
 
     event Approval(address indexed src, address indexed guy, uint256 wad);
     event Transfer(address indexed src, address indexed dst, uint256 wad);
@@ -34,18 +35,16 @@ contract WASA {
     // }
     function deposit() public payable {
         balanceOf[msg.sender] += msg.value;
+        totalSupply += msg.value;
         emit Deposit(msg.sender, msg.value);
     }
 
     function withdraw(uint256 wad) public {
         require(balanceOf[msg.sender] >= wad, "");
         balanceOf[msg.sender] -= wad;
+        totalSupply -= wad;
         msg.sender.transfer(wad);
         emit Withdrawal(msg.sender, wad);
-    }
-
-    function totalSupply() public view returns (uint256) {
-        return address(this).balance;
     }
 
     function approve(address guy, uint256 wad) public returns (bool) {
