@@ -13,6 +13,12 @@ interface ISolarswapFactory {
 
     function feeToSetter() external view returns (address);
 
+    function numeratorProtocolFee() external view returns (uint256);
+
+    function denominatorProtocolFee() external view returns (uint256);
+
+    function allFee() external view returns (uint256);
+
     function getPair(address tokenA, address tokenB)
         external
         view

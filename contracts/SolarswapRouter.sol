@@ -377,7 +377,8 @@ contract SolarswapRouter is ISolarswapRouter02 {
         ensure(deadline)
         returns (uint256[] memory amounts)
     {
-        amounts = SolarswapLibrary.getAmountsOut(factory, amountIn, path);
+        uint256 allFee = getAllFee();
+        amounts = SolarswapLibrary.getAmountsOut(allFee, factory, amountIn, path);
         require(
             amounts[amounts.length - 1] >= amountOutMin,
             "SolarswapRouter: INSUFFICIENT_OUTPUT_AMOUNT"
@@ -404,7 +405,8 @@ contract SolarswapRouter is ISolarswapRouter02 {
         ensure(deadline)
         returns (uint256[] memory amounts)
     {
-        amounts = SolarswapLibrary.getAmountsIn(factory, amountOut, path);
+        uint256 allFee = getAllFee();
+        amounts = SolarswapLibrary.getAmountsIn(allFee, factory, amountOut, path);
         require(
             amounts[0] <= amountInMax,
             "SolarswapRouter: EXCESSIVE_INPUT_AMOUNT"
@@ -432,7 +434,8 @@ contract SolarswapRouter is ISolarswapRouter02 {
         returns (uint256[] memory amounts)
     {
         require(path[0] == WETH, "SolarswapRouter: INVALID_PATH");
-        amounts = SolarswapLibrary.getAmountsOut(factory, msg.value, path);
+        uint256 allFee = getAllFee();
+        amounts = SolarswapLibrary.getAmountsOut(allFee, factory, msg.value, path);
         require(
             amounts[amounts.length - 1] >= amountOutMin,
             "SolarswapRouter: INSUFFICIENT_OUTPUT_AMOUNT"
@@ -461,7 +464,8 @@ contract SolarswapRouter is ISolarswapRouter02 {
         returns (uint256[] memory amounts)
     {
         require(path[path.length - 1] == WETH, "SolarswapRouter: INVALID_PATH");
-        amounts = SolarswapLibrary.getAmountsIn(factory, amountOut, path);
+        uint256 allFee = getAllFee();
+        amounts = SolarswapLibrary.getAmountsIn(allFee, factory, amountOut, path);
         require(
             amounts[0] <= amountInMax,
             "SolarswapRouter: EXCESSIVE_INPUT_AMOUNT"
@@ -491,7 +495,8 @@ contract SolarswapRouter is ISolarswapRouter02 {
         returns (uint256[] memory amounts)
     {
         require(path[path.length - 1] == WETH, "SolarswapRouter: INVALID_PATH");
-        amounts = SolarswapLibrary.getAmountsOut(factory, amountIn, path);
+        uint256 allFee = getAllFee();
+        amounts = SolarswapLibrary.getAmountsOut(allFee, factory, amountIn, path);
         require(
             amounts[amounts.length - 1] >= amountOutMin,
             "SolarswapRouter: INSUFFICIENT_OUTPUT_AMOUNT"
@@ -521,7 +526,8 @@ contract SolarswapRouter is ISolarswapRouter02 {
         returns (uint256[] memory amounts)
     {
         require(path[0] == WETH, "SolarswapRouter: INVALID_PATH");
-        amounts = SolarswapLibrary.getAmountsIn(factory, amountOut, path);
+        uint256 allFee = getAllFee();
+        amounts = SolarswapLibrary.getAmountsIn(allFee, factory, amountOut, path);
         require(
             amounts[0] <= msg.value,
             "SolarswapRouter: EXCESSIVE_INPUT_AMOUNT"
@@ -562,7 +568,9 @@ contract SolarswapRouter is ISolarswapRouter02 {
                 amountInput = IERC20(input).balanceOf(address(pair)).sub(
                     reserveInput
                 );
+                uint256 allFee = getAllFee();
                 amountOutput = SolarswapLibrary.getAmountOut(
+                    allFee,
                     amountInput,
                     reserveInput,
                     reserveOutput
@@ -661,16 +669,18 @@ contract SolarswapRouter is ISolarswapRouter02 {
         uint256 amountIn,
         uint256 reserveIn,
         uint256 reserveOut
-    ) public pure virtual override returns (uint256 amountOut) {
-        return SolarswapLibrary.getAmountOut(amountIn, reserveIn, reserveOut);
+    ) public view virtual override returns (uint256 amountOut) {
+        uint256 allFee = getAllFee();
+        return SolarswapLibrary.getAmountOut(allFee, amountIn, reserveIn, reserveOut);
     }
 
     function getAmountIn(
         uint256 amountOut,
         uint256 reserveIn,
         uint256 reserveOut
-    ) public pure virtual override returns (uint256 amountIn) {
-        return SolarswapLibrary.getAmountIn(amountOut, reserveIn, reserveOut);
+    ) public view virtual override returns (uint256 amountIn) {
+        uint256 allFee = getAllFee();
+        return SolarswapLibrary.getAmountIn(allFee, amountOut, reserveIn, reserveOut);
     }
 
     function getAmountsOut(uint256 amountIn, address[] memory path)
@@ -680,7 +690,8 @@ contract SolarswapRouter is ISolarswapRouter02 {
         override
         returns (uint256[] memory amounts)
     {
-        return SolarswapLibrary.getAmountsOut(factory, amountIn, path);
+        uint256 allFee = getAllFee();
+        return SolarswapLibrary.getAmountsOut(allFee, factory, amountIn, path);
     }
 
     function getAmountsIn(uint256 amountOut, address[] memory path)
@@ -690,6 +701,11 @@ contract SolarswapRouter is ISolarswapRouter02 {
         override
         returns (uint256[] memory amounts)
     {
-        return SolarswapLibrary.getAmountsIn(factory, amountOut, path);
+        uint256 allFee = getAllFee();
+        return SolarswapLibrary.getAmountsIn(allFee, factory, amountOut, path);
+    }
+
+    function getAllFee() internal view returns (uint256) {
+        return ISolarswapFactory(factory).allFee();
     }
 }

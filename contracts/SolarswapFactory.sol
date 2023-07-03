@@ -9,6 +9,15 @@ contract SolarswapFactory is ISolarswapFactory {
 
     address public feeTo;
     address public feeToSetter;
+    address public admin;
+
+    // allFee = 1%
+    // protocolFee = 0.3%
+    // -> numeratorProtocolFee = 3
+    // -> denominatorProtocolFee = 10
+    uint256 public numeratorProtocolFee = 3;
+    uint256 public denominatorProtocolFee = 10;
+    uint256 public allFee = 100; // to divide with 10,000 (example: allFee = 30 -> fee = 0.3%)
 
     mapping(address => mapping(address => address)) public getPair;
     address[] public allPairs;
@@ -20,18 +29,32 @@ contract SolarswapFactory is ISolarswapFactory {
         uint256
     );
 
-    constructor(address _feeToSetter) public {
+    modifier isFeeToSetter() {
+        require(
+            msg.sender == feeToSetter,
+            "Solarswap: FORBIDDEN_FEE_TO_SETTER"
+        );
+        _;
+    }
+
+    modifier isAdmin() {
+        require(msg.sender == admin, "Solarswap: FORBIDDEN_ADMIN");
+        _;
+    }
+
+    constructor(address _feeToSetter, address _admin) public {
         feeToSetter = _feeToSetter;
+        admin = _admin;
     }
 
     function allPairsLength() external view returns (uint256) {
         return allPairs.length;
     }
 
-    function createPair(address tokenA, address tokenB)
-        external
-        returns (address pair)
-    {
+    function createPair(
+        address tokenA,
+        address tokenB
+    ) external returns (address pair) {
         require(tokenA != tokenB, "Solarswap: IDENTICAL_ADDRESSES");
         (address token0, address token1) = tokenA < tokenB
             ? (tokenA, tokenB)
@@ -53,13 +76,31 @@ contract SolarswapFactory is ISolarswapFactory {
         emit PairCreated(token0, token1, pair, allPairs.length);
     }
 
-    function setFeeTo(address _feeTo) external {
-        require(msg.sender == feeToSetter, "Solarswap: FORBIDDEN");
+    function setFeeTo(address _feeTo) external isFeeToSetter {
         feeTo = _feeTo;
     }
 
-    function setFeeToSetter(address _feeToSetter) external {
-        require(msg.sender == feeToSetter, "Solarswap: FORBIDDEN");
+    function setFeeToSetter(address _feeToSetter) external isAdmin {
         feeToSetter = _feeToSetter;
+    }
+
+    function setProtocolFee(
+        uint256 _numeratorProtocolFee,
+        uint256 _denominatorProtocolFee
+    ) external isFeeToSetter {
+        require(
+            _denominatorProtocolFee > 0 && _numeratorProtocolFee > 0,
+            "Solarswap: INVALID_PROTOCOL_FEE_ZERO"
+        );
+        require(
+            _denominatorProtocolFee > _numeratorProtocolFee,
+            "Solarswap: INVALID_PROTOCOL_FEE"
+        );
+        numeratorProtocolFee = _numeratorProtocolFee;
+        denominatorProtocolFee = _denominatorProtocolFee;
+    }
+
+    function setAllFee(uint256 _allFee) external isFeeToSetter {
+        allFee = _allFee;
     }
 }

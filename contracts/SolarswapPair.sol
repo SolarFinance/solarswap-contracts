@@ -141,12 +141,16 @@ contract SolarswapPair is ISolarswapPair, SolarswapERC20 {
         emit Sync(reserve0, reserve1);
     }
 
-    // if fee is on, mint liquidity equivalent to 8/25 of the growth in sqrt(k)
-    function _mintFee(uint112 _reserve0, uint112 _reserve1)
-        private
-        returns (bool feeOn)
-    {
+    // if fee is on, mint liquidity equivalent to numeratorProtocolFee/denominatorProtocolFee of the growth in sqrt(k)
+    function _mintFee(
+        uint112 _reserve0,
+        uint112 _reserve1
+    ) private returns (bool feeOn) {
         address feeTo = ISolarswapFactory(factory).feeTo();
+        uint256 numeratorProtocolFee = ISolarswapFactory(factory)
+            .numeratorProtocolFee();
+        uint256 denominatorProtocolFee = ISolarswapFactory(factory)
+            .denominatorProtocolFee();
         feeOn = feeTo != address(0);
         uint256 _kLast = kLast; // gas savings
         if (feeOn) {
@@ -156,8 +160,10 @@ contract SolarswapPair is ISolarswapPair, SolarswapERC20 {
                 if (rootK > rootKLast) {
                     uint256 numerator = totalSupply
                         .mul(rootK.sub(rootKLast))
-                        .mul(8);
-                    uint256 denominator = rootK.mul(17).add(rootKLast.mul(8));
+                        .mul(numeratorProtocolFee);
+                    uint256 denominator = rootK
+                        .mul(denominatorProtocolFee - numeratorProtocolFee)
+                        .add(rootKLast.mul(numeratorProtocolFee));
                     uint256 liquidity = numerator / denominator;
                     if (liquidity > 0) _mint(feeTo, liquidity);
                 }
@@ -274,15 +280,16 @@ contract SolarswapPair is ISolarswapPair, SolarswapERC20 {
         );
         {
             // scope for reserve{0,1}Adjusted, avoids stack too deep errors
+            uint256 allFee = ISolarswapFactory(factory).allFee();
             uint256 balance0Adjusted = (
-                balance0.mul(1000).sub(amount0In.mul(2))
+                balance0.mul(10000).sub(amount0In.mul(allFee))
             );
             uint256 balance1Adjusted = (
-                balance1.mul(1000).sub(amount1In.mul(2))
+                balance1.mul(10000).sub(amount1In.mul(allFee))
             );
             require(
                 balance0Adjusted.mul(balance1Adjusted) >=
-                    uint256(_reserve0).mul(_reserve1).mul(1000**2),
+                    uint256(_reserve0).mul(_reserve1).mul(10000**2),
                 "Solarswap: K"
             );
         }

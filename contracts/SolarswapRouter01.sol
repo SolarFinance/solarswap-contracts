@@ -299,7 +299,8 @@ contract SolarswapRouter01 is ISolarswapRouter01 {
         address to,
         uint256 deadline
     ) external override ensure(deadline) returns (uint256[] memory amounts) {
-        amounts = SolarswapLibrary.getAmountsOut(factory, amountIn, path);
+        uint256 allFee = getAllFee();
+        amounts = SolarswapLibrary.getAmountsOut(allFee, factory, amountIn, path);
         require(
             amounts[amounts.length - 1] >= amountOutMin,
             "SolarswapRouter: INSUFFICIENT_OUTPUT_AMOUNT"
@@ -320,7 +321,8 @@ contract SolarswapRouter01 is ISolarswapRouter01 {
         address to,
         uint256 deadline
     ) external override ensure(deadline) returns (uint256[] memory amounts) {
-        amounts = SolarswapLibrary.getAmountsIn(factory, amountOut, path);
+        uint256 allFee = getAllFee();
+        amounts = SolarswapLibrary.getAmountsIn(allFee, factory, amountOut, path);
         require(
             amounts[0] <= amountInMax,
             "SolarswapRouter: EXCESSIVE_INPUT_AMOUNT"
@@ -347,7 +349,8 @@ contract SolarswapRouter01 is ISolarswapRouter01 {
         returns (uint256[] memory amounts)
     {
         require(path[0] == WETH, "SolarswapRouter: INVALID_PATH");
-        amounts = SolarswapLibrary.getAmountsOut(factory, msg.value, path);
+        uint256 allFee = getAllFee();
+        amounts = SolarswapLibrary.getAmountsOut(allFee, factory, msg.value, path);
         require(
             amounts[amounts.length - 1] >= amountOutMin,
             "SolarswapRouter: INSUFFICIENT_OUTPUT_AMOUNT"
@@ -370,7 +373,8 @@ contract SolarswapRouter01 is ISolarswapRouter01 {
         uint256 deadline
     ) external override ensure(deadline) returns (uint256[] memory amounts) {
         require(path[path.length - 1] == WETH, "SolarswapRouter: INVALID_PATH");
-        amounts = SolarswapLibrary.getAmountsIn(factory, amountOut, path);
+        uint256 allFee = getAllFee();
+        amounts = SolarswapLibrary.getAmountsIn(allFee, factory, amountOut, path);
         require(
             amounts[0] <= amountInMax,
             "SolarswapRouter: EXCESSIVE_INPUT_AMOUNT"
@@ -394,7 +398,8 @@ contract SolarswapRouter01 is ISolarswapRouter01 {
         uint256 deadline
     ) external override ensure(deadline) returns (uint256[] memory amounts) {
         require(path[path.length - 1] == WETH, "SolarswapRouter: INVALID_PATH");
-        amounts = SolarswapLibrary.getAmountsOut(factory, amountIn, path);
+        uint256 allFee = getAllFee();
+        amounts = SolarswapLibrary.getAmountsOut(allFee, factory, amountIn, path);
         require(
             amounts[amounts.length - 1] >= amountOutMin,
             "SolarswapRouter: INSUFFICIENT_OUTPUT_AMOUNT"
@@ -423,7 +428,8 @@ contract SolarswapRouter01 is ISolarswapRouter01 {
         returns (uint256[] memory amounts)
     {
         require(path[0] == WETH, "SolarswapRouter: INVALID_PATH");
-        amounts = SolarswapLibrary.getAmountsIn(factory, amountOut, path);
+        uint256 allFee = getAllFee();
+        amounts = SolarswapLibrary.getAmountsIn(allFee, factory, amountOut, path);
         require(
             amounts[0] <= msg.value,
             "SolarswapRouter: EXCESSIVE_INPUT_AMOUNT"
@@ -452,16 +458,18 @@ contract SolarswapRouter01 is ISolarswapRouter01 {
         uint256 amountIn,
         uint256 reserveIn,
         uint256 reserveOut
-    ) public pure override returns (uint256 amountOut) {
-        return SolarswapLibrary.getAmountOut(amountIn, reserveIn, reserveOut);
+    ) public view override returns (uint256 amountOut) {
+        uint256 allFee = getAllFee();
+        return SolarswapLibrary.getAmountOut(allFee, amountIn, reserveIn, reserveOut);
     }
 
     function getAmountIn(
         uint256 amountOut,
         uint256 reserveIn,
         uint256 reserveOut
-    ) public pure override returns (uint256 amountIn) {
-        return SolarswapLibrary.getAmountOut(amountOut, reserveIn, reserveOut);
+    ) public view override returns (uint256 amountIn) {
+        uint256 allFee = getAllFee();
+        return SolarswapLibrary.getAmountOut(allFee, amountOut, reserveIn, reserveOut);
     }
 
     function getAmountsOut(uint256 amountIn, address[] memory path)
@@ -470,7 +478,8 @@ contract SolarswapRouter01 is ISolarswapRouter01 {
         override
         returns (uint256[] memory amounts)
     {
-        return SolarswapLibrary.getAmountsOut(factory, amountIn, path);
+        uint256 allFee = getAllFee();
+        return SolarswapLibrary.getAmountsOut(allFee, factory, amountIn, path);
     }
 
     function getAmountsIn(uint256 amountOut, address[] memory path)
@@ -479,6 +488,11 @@ contract SolarswapRouter01 is ISolarswapRouter01 {
         override
         returns (uint256[] memory amounts)
     {
-        return SolarswapLibrary.getAmountsIn(factory, amountOut, path);
+        uint256 allFee = getAllFee();
+        return SolarswapLibrary.getAmountsIn(allFee, factory, amountOut, path);
+    }
+
+    function getAllFee() internal view returns (uint256) {
+        return ISolarswapFactory(factory).allFee();
     }
 }

@@ -74,6 +74,7 @@ library SolarswapLibrary {
 
     // given an input amount of an asset and pair reserves, returns the maximum output amount of the other asset
     function getAmountOut(
+        uint256 allFee,
         uint256 amountIn,
         uint256 reserveIn,
         uint256 reserveOut
@@ -83,15 +84,16 @@ library SolarswapLibrary {
             reserveIn > 0 && reserveOut > 0,
             "SolarswapLibrary: INSUFFICIENT_LIQUIDITY"
         );
-        uint256 amountInWithFee = amountIn.mul(998);
+        uint256 amountInWithFee = amountIn.mul(10000 - allFee);
         uint256 numerator = amountInWithFee.mul(reserveOut);
-        uint256 denominator = reserveIn.mul(1000).add(amountInWithFee);
+        uint256 denominator = reserveIn.mul(10000).add(amountInWithFee);
         amountOut = numerator / denominator;
         require(reserveOut > amountOut, "SolarswapLibrary: INSUFFICIENT_LIQUIDITY");
     }
 
     // given an output amount of an asset and pair reserves, returns a required input amount of the other asset
     function getAmountIn(
+        uint256 allFee,
         uint256 amountOut,
         uint256 reserveIn,
         uint256 reserveOut
@@ -101,13 +103,14 @@ library SolarswapLibrary {
             reserveIn > 0 && reserveOut > 0,
             "SolarswapLibrary: INSUFFICIENT_LIQUIDITY"
         );
-        uint256 numerator = reserveIn.mul(amountOut).mul(1000);
-        uint256 denominator = reserveOut.sub(amountOut).mul(998);
+        uint256 numerator = reserveIn.mul(amountOut).mul(10000);
+        uint256 denominator = reserveOut.sub(amountOut).mul(10000 - allFee);
         amountIn = (numerator / denominator).add(1);
     }
 
     // performs chained getAmountOut calculations on any number of pairs
     function getAmountsOut(
+        uint256 allFee,
         address factory,
         uint256 amountIn,
         address[] memory path
@@ -121,12 +124,13 @@ library SolarswapLibrary {
                 path[i],
                 path[i + 1]
             );
-            amounts[i + 1] = getAmountOut(amounts[i], reserveIn, reserveOut);
+            amounts[i + 1] = getAmountOut(allFee, amounts[i], reserveIn, reserveOut);
         }
     }
 
     // performs chained getAmountIn calculations on any number of pairs
     function getAmountsIn(
+        uint256 allFee,
         address factory,
         uint256 amountOut,
         address[] memory path
@@ -140,7 +144,7 @@ library SolarswapLibrary {
                 path[i - 1],
                 path[i]
             );
-            amounts[i - 1] = getAmountIn(amounts[i], reserveIn, reserveOut);
+            amounts[i - 1] = getAmountIn(allFee, amounts[i], reserveIn, reserveOut);
         }
     }
 }
