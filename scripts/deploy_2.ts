@@ -72,7 +72,7 @@ async function nativeTransfer(from: string, to: string, amount: number) {
 export async function deploy2(
 	treasury: Treasury,
 	wasa: WASA,
-	usdt: MockERC20,
+	usdt: any,
 	solarswapFactory: SolarswapFactory,
 	solarswapRouter: SolarswapRouter,
 	masterChef: MasterChef
@@ -159,6 +159,8 @@ export async function deploy2(
 		await masterChef.add(initAllocPoint, pair, false);
 		await delay(delayTime);
 		console.log("Masterchef pool length", await masterChef.poolLength());
+
+		// ---------------- 7. Set feeTo trong SolarswapFactory để kích hoạt fee cho Stella -------------------------------------------
 	} catch (err) {
 		console.error(err);
 		process.exitCode = 1;

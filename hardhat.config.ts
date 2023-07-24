@@ -8,7 +8,7 @@ import "dotenv/config";
 const asaTestnet: NetworkUserConfig = {
   url: "https://rpc.astranaut.dev/",
   chainId: 11115,
-  accounts: [process.env.KEY_TESTNET!],
+  accounts: [process.env.KEY_TESTNET!, process.env.KEY_TESTNET2!],
 };
 
 const bscTestnet: NetworkUserConfig = {
@@ -17,11 +17,11 @@ const bscTestnet: NetworkUserConfig = {
   accounts: [],
 };
 
-// const asaMainnet: NetworkUserConfig = {
-//   url: "https://rpc.astranaut.io/",
-//   chainId: 11110,
-//   accounts: [process.env.KEY_MAINNET!],
-// };
+const asaMainnet: NetworkUserConfig = {
+  url: "https://rpc.astranaut.io/",
+  chainId: 11110,
+  accounts: [process.env.KEY_MAINNET!, process.env.KEY_MAINNET2!],
+};
 
 const config: HardhatUserConfig = {
   defaultNetwork: "hardhat",
@@ -33,7 +33,7 @@ const config: HardhatUserConfig = {
     },
     testnet: asaTestnet,
     bsctestnet: bscTestnet,
-    // mainnet: asaMainnet,
+    mainnet: asaMainnet,
     hardhat: {
       blockGasLimit: 12500000,
       initialBaseFeePerGas: 0,
@@ -219,14 +219,23 @@ const config: HardhatUserConfig = {
   etherscan: {
     apiKey: {
       testnet: "abc",
+      mainnet: "abc",
     },
     customChains: [
       {
         network: "testnet",
         chainId: 11115,
         urls: {
-          apiURL: "https://blockscout.astranaut.dev/api",
+          apiURL: "https://chainindexing.astranaut.dev/api",
           browserURL: "https://explorer.astranaut.dev",
+        },
+      },
+      {
+        network: "mainnet",
+        chainId: 11110,
+        urls: {
+          apiURL: "https://chainindexing.astranaut.io/api",
+          browserURL: "https://explorer.astranaut.io",
         },
       },
     ],
