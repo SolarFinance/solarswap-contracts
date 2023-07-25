@@ -20,7 +20,9 @@ async function main() {
 	const networkName = network.name;
 	const startBlock = "5000"; // must less than current latest block
 
-	const [deployer, admin] = await ethers.getSigners();
+	// adminAddr is multisig address (feeTo, feeToSetter, admin of MasterChef)
+	const adminAddr = '';
+	// const [deployer] = await ethers.getSigners();
 	//------------------------- Treasury ---------------------------------------
 	const Treasury = await ethers.getContractFactory("Treasury");
 	const treasury = await Treasury.deploy();
@@ -75,13 +77,13 @@ async function main() {
 
 	//------------------------- SolarswapFactory ---------------------------------------
 	const SolarswapFactory = await ethers.getContractFactory("SolarswapFactory");
-	const solarswapFactory = await SolarswapFactory.deploy(deployer.address, admin.address);
+	const solarswapFactory = await SolarswapFactory.deploy(adminAddr);
 	await solarswapFactory.deployed();
 	result["SolarswapFactory"] = {
 		...(result["SolarswapFactory"] || {}),
 		[networkName]: {
 			address: solarswapFactory.address,
-			arguments: [deployer.address, admin.address],
+			arguments: [adminAddr],
 		},
 	};
 
@@ -142,6 +144,7 @@ async function main() {
 	//------------------------- MasterChef ---------------------------------------
 	const MasterChef = await ethers.getContractFactory("MasterChef");
 	const masterChef = await MasterChef.deploy(
+		adminAddr,
 		treasury.address,
 		wasa.address,
 		parseEther("0.4"),
@@ -153,7 +156,7 @@ async function main() {
 		...(result["MasterChef"] || {}),
 		[networkName]: {
 			address: masterChef.address,
-			arguments: [treasury.address, wasa.address, parseEther("0.4").toString(), startBlock],
+			arguments: [adminAddr, treasury.address, wasa.address, parseEther("0.4").toString(), startBlock],
 		},
 	};
 	console.log("MasterChef contract deployed to:", masterChef.address);
