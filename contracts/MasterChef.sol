@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.6.12;
 
-import "openzeppelin6/access/Ownable.sol";
 import "openzeppelin6/GSN/Context.sol";
 import "openzeppelin6/math/SafeMath.sol";
 import "openzeppelin6/utils/Address.sol";
@@ -17,7 +16,7 @@ import "./Treasury.sol";
 // distributed and the community can show to govern itself.
 //
 // Have fun reading it. Hopefully it's bug-free. God bless.
-contract MasterChef is Ownable {
+contract MasterChef {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
@@ -46,6 +45,8 @@ contract MasterChef is Ownable {
         uint256 accWASAPerShare; // Accumulated WASAs per share, times 1e12. See below.
     }
 
+    // The multisig Admin
+    address public admin;
     // The Treasury
     Treasury public treasury;
     // The WASA TOKEN!
@@ -74,15 +75,22 @@ contract MasterChef is Ownable {
     );
 
     constructor(
+        address _admin,
         Treasury _treasury,
         WASA _wasa,
-        uint256 _wasaPerBlock, // 0.5
+        uint256 _wasaPerBlock, // 0.4
         uint256 _startBlock
     ) public {
+        admin = _admin;
         treasury = _treasury;
         wasa = _wasa;
         wasaPerBlock = _wasaPerBlock;
         startBlock = _startBlock;
+    }
+
+    modifier isAdmin() {
+        require(msg.sender == admin, "MasterChef: FORBIDDEN_ADMIN");
+        _;
     }
 
     receive() external payable {}
@@ -97,7 +105,7 @@ contract MasterChef is Ownable {
         uint256 _allocPoint,
         IERC20 _lpToken,
         bool _withUpdate
-    ) public onlyOwner {
+    ) public isAdmin {
         if (_withUpdate) {
             massUpdatePools();
         }
@@ -121,7 +129,7 @@ contract MasterChef is Ownable {
         uint256 _pid,
         uint256 _allocPoint,
         bool _withUpdate
-    ) public onlyOwner {
+    ) public isAdmin {
         if (_withUpdate) {
             massUpdatePools();
         }
@@ -256,12 +264,12 @@ contract MasterChef is Ownable {
         }
     }
 
-    function updateWasaPerBlock(uint256 newWasaPerBlock) external onlyOwner {
+    function updateWasaPerBlock(uint256 newWasaPerBlock) external isAdmin {
         wasaPerBlock = newWasaPerBlock;
         emit UpdateWasaPerBlock(newWasaPerBlock);
     }
 
-    function emergencyWithdrawFromTreasury(address _to) external onlyOwner {
+    function emergencyWithdrawFromTreasury(address _to) external isAdmin {
         treasury.emergencyWithdraw(payable(_to));
     }
 }
