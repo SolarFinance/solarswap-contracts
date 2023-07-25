@@ -7,9 +7,10 @@ contract SolarswapFactory is ISolarswapFactory {
     bytes32 public constant INIT_CODE_PAIR_HASH =
         keccak256(abi.encodePacked(type(SolarswapPair).creationCode));
 
+    // Multisig feeTo address
     address public feeTo;
+    // Multisig feeToSetter address
     address public feeToSetter;
-    address public admin;
 
     // allFee = 1%
     // protocolFee = 0.3%
@@ -37,14 +38,8 @@ contract SolarswapFactory is ISolarswapFactory {
         _;
     }
 
-    modifier isAdmin() {
-        require(msg.sender == admin, "Solarswap: FORBIDDEN_ADMIN");
-        _;
-    }
-
-    constructor(address _feeToSetter, address _admin) public {
+    constructor(address _feeToSetter) public {
         feeToSetter = _feeToSetter;
-        admin = _admin;
     }
 
     function allPairsLength() external view returns (uint256) {
@@ -78,10 +73,6 @@ contract SolarswapFactory is ISolarswapFactory {
 
     function setFeeTo(address _feeTo) external isFeeToSetter {
         feeTo = _feeTo;
-    }
-
-    function setFeeToSetter(address _feeToSetter) external isAdmin {
-        feeToSetter = _feeToSetter;
     }
 
     function setProtocolFee(
