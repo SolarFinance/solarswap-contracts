@@ -8,7 +8,7 @@ import "dotenv/config";
 const asaTestnet: NetworkUserConfig = {
   url: "https://rpc.astranaut.dev/",
   chainId: 11115,
-  accounts: [process.env.KEY_TESTNET!, process.env.KEY_TESTNET2!],
+  accounts: [process.env.KEY_TESTNET!],
 };
 
 const bscTestnet: NetworkUserConfig = {
@@ -20,7 +20,7 @@ const bscTestnet: NetworkUserConfig = {
 const asaMainnet: NetworkUserConfig = {
   url: "https://rpc.astranaut.io/",
   chainId: 11110,
-  accounts: [process.env.KEY_MAINNET!, process.env.KEY_MAINNET2!],
+  accounts: [process.env.KEY_MAINNET!],
 };
 
 const config: HardhatUserConfig = {

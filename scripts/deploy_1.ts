@@ -18,10 +18,11 @@ function readResult() {
 async function main() {
 	let result: DeployedResult | any = {};
 	const networkName = network.name;
-	const startBlock = "5000"; // must less than current latest block
+	const startBlock: any = "5000"; // must less than current latest block
 
 	// adminAddr is multisig address (feeTo, feeToSetter, admin of MasterChef)
-	const adminAddr = '';
+	// const adminAddr = '0x29dfE343C3c347a36d1CCce3d5867a6ED785fA30'; // TESTNET
+	const adminAddr = '0x13329f5b0E5fE7881Cfe88d0193cE282f87B33f1'; // MAINNET
 	// const [deployer] = await ethers.getSigners();
 	//------------------------- Treasury ---------------------------------------
 	const Treasury = await ethers.getContractFactory("Treasury");
@@ -50,17 +51,17 @@ async function main() {
 	console.log("WASA contract deployed to:", wasa.address);
 
 	//------------------------- USDT ---------------------------------------
-	const USDT = await ethers.getContractFactory("MockERC20");
-	const usdt = await USDT.deploy("Tether USD", "USDT", parseEther("30000000"));
-	await usdt.deployed();
-	result["USDT"] = {
-		...(result["USDT"] || {}),
-		[networkName]: {
-			address: usdt.address,
-			arguments: ["Tether USD", "USDT", parseEther("30000000").toString()],
-		},
-	};
-	console.log("USDT contract deployed to:", usdt.address);
+	// const USDT = await ethers.getContractFactory("MockERC20");
+	// const usdt = await USDT.deploy("Tether USD", "USDT", parseEther("30000000"));
+	// await usdt.deployed();
+	// result["USDT"] = {
+	// 	...(result["USDT"] || {}),
+	// 	[networkName]: {
+	// 		address: usdt.address,
+	// 		arguments: ["Tether USD", "USDT", parseEther("30000000").toString()],
+	// 	},
+	// };
+	// console.log("USDT contract deployed to:", usdt.address);
 
 	//------------------------- Multicall2 ---------------------------------------
 	const Multicall2 = await ethers.getContractFactory("Multicall2");
@@ -165,7 +166,7 @@ async function main() {
 	writeResult(result);
 
 	// Continue deploy another smartcontract
-	await deploy2(treasury, wasa, usdt, solarswapFactory, solarswapRouter, masterChef);
+	// await deploy2(treasury, wasa, usdt, solarswapFactory, solarswapRouter, masterChef);
 
 	// Verify smartcontract
 	let dataToVerify = readResult();
